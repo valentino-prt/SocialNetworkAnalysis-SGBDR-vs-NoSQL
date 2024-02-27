@@ -13,4 +13,6 @@ public interface CustomProductRepo {
     int findBoughtProductByProductAndDepth(String productName, int depth);
     List<Product> getBoughtProductsCircle(String user, int depth);
 
+
+
 }

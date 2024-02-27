@@ -1,42 +1,48 @@
 package org.example.socialnetworkanalysissgbdr.services;
 
-
 import org.example.socialnetworkanalysissgbdr.data.Product;
-import org.example.socialnetworkanalysissgbdr.repos.ProductRepo;
+import org.example.socialnetworkanalysissgbdr.data.User;
+import org.example.socialnetworkanalysissgbdr.repos.product.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service("SqlProductService")
 public class ProductService {
 
-//    private final ProductRepo repo;
-//
-//    @Autowired
-//    public ProductService(ProductRepo repo) {
-//        this.repo = repo;
+    @Autowired
+    private ProductRepo repo;
+
+    public ProductService() {
+    }
+
+
+    public void dump() {
+        repo.deleteAllInBatch();
+    }
+
+    public void insertRandomProducts(int count) {
+        repo.insertRandomProducts(count);
+    }
+
+//    public List<Product> getBoughtProductsCircle(User user) {
+//        return repo.getBoughtProductsCircle(user.getId());
 //    }
-//
-//    public Product createProduct(String name, String description, double price) {
-//        Product product = new Product(name, description, price);
-//        repo.save(product);
-//        return product;
+
+    public int getBoughtProductByProductAndDepth(String product, int depth) {
+        return repo.findBoughtProductByProductAndDepth(product, depth);
+    }
+
+//    public Product getProductByName(String s) {
+//        return this.repo.findByName(s);
 //    }
-//
-//    public void dump() {
-//        this.repo.deleteAll();
-//    }
-//
-//    public Product getProductByName(String name) {
-//        return this.repo.findByName(name);
-//    }
-//
-//    public void save(Product product) {
-//        this.repo.save(product);
-//    }
-//
-//    public List<Product> findAll() {
-//        return this.repo.findAll();
-//    }
+
+
+    public List<Product> findAll() {
+        return this.repo.findAll();
+    }
+
+
+
 }

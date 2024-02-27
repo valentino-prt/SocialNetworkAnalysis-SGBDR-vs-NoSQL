@@ -40,15 +40,5 @@ public class ProductController {
         return ResponseEntity.ok().body("ok");
     }
 
-    @PostMapping("/createSingleProduct")
-    public ResponseEntity<?> createSingleProduct(@RequestBody Product product) {
-        try {
-            noSqlProductService.createProduct(product.getName(), product.getDescription(), product.getPrice());
-            return ResponseEntity.ok().body("Le produit a été créé avec succès.");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erreur lors de la création du produit : " + e.getMessage());
-        }
-    }
-
 
 }

@@ -18,7 +18,7 @@ public class Product {
     private String description;
     private double price;
 
-    @ManyToMany(mappedBy = "boughtProducts")
+    @ManyToMany(mappedBy = "boughtProducts", cascade = CascadeType.ALL)
     private Set<User> boughtBy = new HashSet<>();
 
     public Product() {

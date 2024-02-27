@@ -2,7 +2,7 @@ package org.example.socialnetworkanalysissgbdr.services;
 
 import org.example.socialnetworkanalysissgbdr.data.Product;
 import org.example.socialnetworkanalysissgbdr.data.User;
-import org.example.socialnetworkanalysissgbdr.repos.UserRepo;
+import org.example.socialnetworkanalysissgbdr.repos.user.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,19 +17,8 @@ public class UserService {
     public UserService() {
     }
 
-    public User createUser(String s) {
-        User user = new User(s);
-        repo.save(user);
-        return user;
-    }
-
-    public void buyProduct(User user, Product product) {
-        user.buy(product);
-        repo.save(user);
-    }
-
     public void dump() {
-        repo.deleteAll();
+        repo.deleteAllInBatch();
     }
 
     public void save(User user) {
@@ -38,5 +27,9 @@ public class UserService {
 
     public void saveAll(List<User> users) {
         repo.saveAll(users);
+    }
+
+    public void createMultipleUsers(int count) {
+        repo.insertRandomUsers(count);
     }
 }

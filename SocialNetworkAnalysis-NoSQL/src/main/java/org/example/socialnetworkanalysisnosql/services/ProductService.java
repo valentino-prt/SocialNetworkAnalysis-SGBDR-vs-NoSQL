@@ -17,11 +17,6 @@ public class ProductService {
     public ProductService() {
     }
 
-    public Product createProduct(String s, String description, double price) {
-        Product product = new Product(s, description, price);
-        repo.save(product);
-        return product;
-    }
 
     public void dump() {
         while (repo.count() > 0)

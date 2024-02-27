@@ -15,7 +15,7 @@ public class User {
 
     private String name;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_bought_products",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -23,7 +23,7 @@ public class User {
     )
     private Set<Product> boughtProducts = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_followers",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -31,7 +31,7 @@ public class User {
     )
     private Set<User> followers = new HashSet<>();
 
-    @ManyToMany(mappedBy = "followers")
+    @ManyToMany(mappedBy = "followers", cascade = CascadeType.ALL)
     private Set<User> follows = new HashSet<>();
 
     public User() {
