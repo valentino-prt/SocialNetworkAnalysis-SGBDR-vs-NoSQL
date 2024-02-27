@@ -37,13 +37,13 @@ public class UserRepoImpl implements CustomUserRepository {
     @Override
     public int getBoughtProductCountCircle(String userName, String productName) {
 
-        String query = "MATCH (influencer:User) <-[:FOLLOWERS*1..]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
-                "WHERE id(influencer) = $userId AND id(product) = $productId\n" +
+        String query = "MATCH (influencer:User) <-[:FOLLOWERS*1..4]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
+                "WHERE influencer.name = $userName AND product.name = $productName\n" +
                 "WITH COUNT(DISTINCT follower) AS buyersCount\n" +
                 "RETURN buyersCount";
 
         try (Session session = driver.session()) {
-            Result result = session.run(query, Values.parameters("userId", userName, "productId", productName));
+            Result result = session.run(query, Values.parameters("userName", userName, "productName", productName));
             if (result.hasNext()) {
                 return result.next().get("buyersCount").asInt();
             }

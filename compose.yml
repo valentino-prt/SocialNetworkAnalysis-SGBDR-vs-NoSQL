@@ -25,6 +25,8 @@ services:
     environment:
       - NEO4J_AUTH=none # Désactiver l'authentification
       - NEO4J_dbms_directories_import=/var/lib/neo4j/import
+      - NEO4J_server_memory_pagecache_size=4G
+      - NEO4J_server_memory_heap_max__size=4G
 volumes:
   neo4j-data:
   postgres-data:

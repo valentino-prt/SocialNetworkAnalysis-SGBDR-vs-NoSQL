@@ -1,9 +1,12 @@
 package org.example.socialnetworkanalysisnosql.controller;
 
+import org.example.socialnetworkanalysisnosql.data.Product;
 import org.example.socialnetworkanalysisnosql.services.ProductService;
 import org.example.socialnetworkanalysisnosql.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/social")
@@ -15,20 +18,6 @@ public class UserController {
     public UserController(UserService userService, ProductService productService) {
         this.userService = userService;
         this.productService = productService;
-    }
-
-    @PostMapping("/createMultipleUsers")
-    public ResponseEntity<?> createMultipleUsers(@RequestParam("count") int count) {
-        if (count <= 0) {
-            return ResponseEntity.badRequest().body("Le nombre d'utilisateurs à créer doit être supérieur à 0.");
-        }
-
-        try {
-            userService.insertRandomUsers(count);
-            return ResponseEntity.ok().body(count + " utilisateurs ont été créés avec succès.");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erreur lors de la création des utilisateurs : " + e.getMessage());
-        }
     }
 
     @PostMapping("/importFromCsv")
@@ -80,13 +69,39 @@ public class UserController {
         }
     }
 
-    @PostMapping("/followRandomUsers")
-    public ResponseEntity<?> followRandomUsers() {
+    @GetMapping("/getBoughtProductCircle/{userName}/{depth}")
+    public ResponseEntity<?> getBoughtProductCircle(@PathVariable String userName, @PathVariable int depth) {
         try {
-            userService.followUsersFromCsv();
-            return ResponseEntity.ok().body("Les utilisateurs suivent maintenant des utilisateurs aléatoires.");
+            long startTime, endTime, duration;
+
+            startTime = System.nanoTime();
+            List<Product> products = productService.getBoughtProductsCircle(userName, depth);
+            endTime = System.nanoTime();
+            duration = (endTime - startTime) / 1_000_000; // Convertir en millisecondes
+            StringBuilder sb = new StringBuilder();
+            for (Product product : products) {
+                sb.append(product.getName()).append("\n");
+            }
+            return ResponseEntity.ok().body("Produits achetés par " + userName + " et ses followers : " + sb + "\nDurée : " + duration + " ms");
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erreur lors du suivi des utilisateurs : " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Erreur lors de la récupération des produits achetés par " + userName + " et ses followers : " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/getBoughtProductCountCircle/{userName}/{productName}")
+    public ResponseEntity<?> getBoughtProductCountCircle(@PathVariable String userName, @PathVariable String productName) {
+        try {
+            long startTime, endTime, duration;
+
+            startTime = System.nanoTime();
+            int count = userService.getBoughtProductCountCircle(userName, productName);
+
+            endTime = System.nanoTime();
+            duration = (endTime - startTime) / 1_000_000; // Convertir en millisecondes
+
+            return ResponseEntity.ok().body("Nombre de produits achetés par " + userName + " et ses followers : " + count + "\nDurée : " + duration + " ms");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors de la récupération du nombre de produits achetés par " + userName + " et ses followers : " + e.getMessage());
         }
     }
 }
