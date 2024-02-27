@@ -29,6 +29,10 @@ public class User {
         this.name = name;
     }
 
+    public long getId() {
+        return this.id;
+    }
+
     public void buy(Product product) {
         boughtProducts.add(product);
     }

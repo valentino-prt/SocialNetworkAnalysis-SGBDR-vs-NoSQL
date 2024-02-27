@@ -32,7 +32,11 @@ public class StartRunner implements ApplicationRunner {
         userService.dump();
         productService.dump();
 
-        sampleDB();
+
+        userService.insertRandomUsers(100000);
+        userService.insertRandomProducts(10000);
+        userService.followRandomUsers();
+
     }
 
     private void generateProducts(int count) {
@@ -42,9 +46,23 @@ public class StartRunner implements ApplicationRunner {
         }
     }
 
+    private void createUsers(int count) {
+        List<User> usersToInsert = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            User user = new User("User " + i);
+            usersToInsert.add(user);
+            if (usersToInsert.size() == 1000) {
+                userService.saveAll(usersToInsert);
+                usersToInsert.clear();
+            }
+        }
+        userService.saveAll(usersToInsert);
+    }
+
     private void generateUsers(int count) {
         List<Product> products = productService.findAll();
         List<User> users = new ArrayList<>();
+        List<User> usersToSave = new ArrayList<>();
 
         // Créer les utilisateurs
         for (int i = 0; i < count; i++) {
@@ -52,25 +70,33 @@ public class StartRunner implements ApplicationRunner {
             users.add(user);
         }
 
-        // Assigner les followers et les produits de façon aléatoire
-        users.forEach(user -> {
+        for(int i = 0; i < count; i++) {
             // Acheter des produits aléatoires
-            IntStream.range(0, rand.nextInt(6)).forEach(k -> user.buy(products.get(rand.nextInt(products.size()))));
+            int finalI = i;
+            IntStream.range(0, rand.nextInt(5)).forEach(k -> users.get(finalI).buy(products.get(rand.nextInt(products.size()))));
 
             // Suivre des utilisateurs aléatoires
-            IntStream.range(0, rand.nextInt(21)).forEach(j -> {
+            IntStream.range(0, rand.nextInt(10)).forEach(j -> {
                 User userToFollow = users.get(rand.nextInt(users.size()));
                 // Éviter que l'utilisateur se suive lui-même
-                if (!user.equals(userToFollow)) {
-                    if(userToFollow.getFollowerCount() < 20) {
-                        user.follow(userToFollow);
-                        userToFollow.followedBy(user);
-                        }
+                if (!users.get(finalI).equals(userToFollow)) {
+                    if(userToFollow.getFollowerCount() < 10) {
+                        users.get(finalI).follow(userToFollow);
+                        userToFollow.followedBy(users.get(finalI));
+                    }
                 }
             });
-        });
 
-        userService.saveAll(users);
+            usersToSave.add(users.get(i));
+            if (usersToSave.size() == 100000) {
+                userService.saveAll(usersToSave);
+                usersToSave.clear();
+            }
+
+        }
+
+        userService.saveAll(usersToSave);
+
     }
 
     private void sampleDB() {
@@ -110,6 +136,9 @@ public class StartRunner implements ApplicationRunner {
         User userF = new User("UserF"); // Encore un nouvel utilisateur pour un autre produit exclusif
         userF.buy(productD); // UserF achète ProductD, exclusivement
 
+        userE.follow(userD);
+        userE.buy(productA);
+
         // Sauvegarder tous les utilisateurs et produits
         userService.save(userA);
         userService.save(userB);
@@ -117,5 +146,13 @@ public class StartRunner implements ApplicationRunner {
         userService.save(userD);
         userService.save(userE);
         userService.save(userF);
+
+        List<Product> products = this.userService.getBoughtProductsCircle(userA);
+        int count = this.userService.getBoughtProductCountCircle(userA, productA);
+        int count2 = this.userService.getBoughtProductByProductAndDepth(productA.getName(), 2);
+
+        System.out.println("Products bought by userA and his followers: ");
+        products.forEach(System.out::println);
+
     }
 }

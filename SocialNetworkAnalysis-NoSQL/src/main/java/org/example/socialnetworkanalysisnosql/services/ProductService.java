@@ -1,6 +1,7 @@
 package org.example.socialnetworkanalysisnosql.services;
 
 import org.example.socialnetworkanalysisnosql.data.Product;
+import org.example.socialnetworkanalysisnosql.data.User;
 import org.example.socialnetworkanalysisnosql.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ public class ProductService {
     }
 
     public void dump() {
-        this.repo.deleteAll();
+        while (repo.count() > 0)
+            repo.dumpLimit();
     }
 
     public Product getProductByName(String s) {
