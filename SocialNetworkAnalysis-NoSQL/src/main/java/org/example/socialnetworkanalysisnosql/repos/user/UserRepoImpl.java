@@ -1,6 +1,7 @@
 package org.example.socialnetworkanalysisnosql.repos.user;
 
 import com.opencsv.CSVWriter;
+import org.example.socialnetworkanalysisnosql.data.Product;
 import org.example.socialnetworkanalysisnosql.data.User;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Result;
@@ -117,5 +118,10 @@ public class UserRepoImpl implements CustomUserRepository {
 
 
 
+    }
+
+    @Override
+    public List<Product> getBoughtProductsCircle(long userId) {
+        return null;
     }
 }

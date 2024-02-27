@@ -50,17 +50,5 @@ public class ProductController {
         }
     }
 
-    @PostMapping("/createMultipleProducts")
-    public ResponseEntity<?> createMultipleProducts(@RequestParam("count") int count) {
-        if (count <= 0) {
-            return ResponseEntity.badRequest().body("Le nombre de produits à créer doit être supérieur à 0.");
-        }
 
-        try {
-            userService.insertRandomProducts(count);
-            return ResponseEntity.ok().body(count + " produits ont été créés avec succès.");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erreur lors de la création des produits : " + e.getMessage());
-        }
-    }
 }
