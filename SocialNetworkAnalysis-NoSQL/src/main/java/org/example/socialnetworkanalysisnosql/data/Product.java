@@ -29,6 +29,13 @@ public class Product {
         this.price = price;
     }
 
+    public Product(long id, String name, String description, double price) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+    }
+
     public double getPrice() {
         return price;
     }

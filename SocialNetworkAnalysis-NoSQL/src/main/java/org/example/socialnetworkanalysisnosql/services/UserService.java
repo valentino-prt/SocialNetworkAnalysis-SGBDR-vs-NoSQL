@@ -43,4 +43,8 @@ public class UserService {
     public void followRandomUsers() {
         userRepo.followRandomUsers(userRepo.findAll());
     }
+
+    public void buyRandomProducts(List<Product> products, int userCount) {
+        userRepo.buyRandomProducts(products, userCount);
+    }
 }

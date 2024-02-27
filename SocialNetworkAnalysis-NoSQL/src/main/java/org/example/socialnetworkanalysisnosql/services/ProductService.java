@@ -32,8 +32,8 @@ public class ProductService {
         repo.insertRandomProducts(count);
     }
 
-    public List<Product> getBoughtProductsCircle(User user) {
-        return repo.getBoughtProductsCircle(user.getId());
+    public List<Product> getBoughtProductsCircle(String user, int depth) {
+        return repo.getBoughtProductsCircle(user, depth);
     }
 
     public int getBoughtProductByProductAndDepth(String product, int depth) {

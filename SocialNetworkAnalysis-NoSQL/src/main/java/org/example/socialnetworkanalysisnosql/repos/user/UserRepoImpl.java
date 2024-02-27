@@ -1,6 +1,7 @@
 package org.example.socialnetworkanalysisnosql.repos.user;
 
 import com.opencsv.CSVWriter;
+import org.example.socialnetworkanalysisnosql.data.Product;
 import org.example.socialnetworkanalysisnosql.data.User;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Result;
@@ -33,6 +34,75 @@ public class UserRepoImpl implements CustomUserRepository {
         try (Session session = driver.session()) {
             session.run(queryIndex);
         }
+    }
+
+    @Override
+    public int getBoughtProductCountCircle(long userId, long productId) {
+
+        String query = "MATCH (influencer:User) <-[:FOLLOWERS*1..]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
+                "WHERE id(influencer) = $userId AND id(product) = $productId\n" +
+                "WITH COUNT(DISTINCT follower) AS buyersCount\n" +
+                "RETURN buyersCount";
+
+        try (Session session = driver.session()) {
+            Result result = session.run(query, Values.parameters("userId", userId, "productId", productId));
+            if (result.hasNext()) {
+                return result.next().get("buyersCount").asInt();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return -1;
+    }
+
+    @Override
+    public void buyRandomProducts(List<Product> products, int userCount) {
+
+        Random rand = new Random();
+        int randomInt;
+        int randomCountFollowers;
+        List<Map<String, String>> productPairs = new ArrayList<>();
+
+
+        for(int i = 1; i <= userCount; i++) {
+
+            System.out.println("User buy : " + i);
+
+            for(int j = 0; j < rand.nextInt(0, 10); j++){
+                randomInt = rand.nextInt(0, products.size() - 1);
+                Map<String, String> pair = new HashMap<>();
+                pair.put("userName", "User" + i);
+                pair.put("productName", products.get(randomInt).getName());
+                productPairs.add(pair);
+            }
+        }
+
+        File file = new File("neo4j/import/buyPairs.csv");
+        try {
+            FileWriter outputFile = new FileWriter(file);
+            CSVWriter writer = new CSVWriter(outputFile);
+
+            String[] header = {"user", "product"};
+            writer.writeNext(header);
+
+            for (Map<String, String> pair : productPairs) {
+                String[] data = {pair.get("userName"), pair.get("productName")};
+                writer.writeNext(data);
+            }
+
+            writer.close();
+
+            try (Session session = driver.session()){
+                session.run("LOAD CSV WITH HEADERS FROM 'file:///buyPairs.csv' AS row\n" +
+                        "MATCH (user:User {name: row.user}), (product:Product {name: row.product})\n" +
+                        "MERGE (user)-[:BOUGHT]->(product)\n");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -78,8 +148,8 @@ public class UserRepoImpl implements CustomUserRepository {
 
             try (Session session = driver.session()){
                 session.run("LOAD CSV WITH HEADERS FROM 'file:///followPairs.csv' AS row\n" +
-                        "MATCH (user:User {name: row.user}), (followUser:User {name: row.followedUser})\n" +
-                        "MERGE (user)-[:FOLLOWS]->(followUser)\n");
+                        "MATCH (user:User {name: row.user}), (followedUser:User {name: row.followedUser})\n" +
+                        "MERGE (user)-[:FOLLOWERS]->(followedUser)\n");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
