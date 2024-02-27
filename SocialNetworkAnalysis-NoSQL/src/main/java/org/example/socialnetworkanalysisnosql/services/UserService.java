@@ -30,7 +30,8 @@ public class UserService {
     }
 
     public void dump() {
-        repo.deleteAll();
+        while (repo.count() > 0)
+            repo.dumpLimit();
     }
 
     public void save(User user) {
@@ -39,5 +40,29 @@ public class UserService {
 
     public void saveAll(List<User> users) {
         repo.saveAll(users);
+    }
+
+    public void insertRandomUsers(int count) {
+        repo.insertRandomUsers(count);
+    }
+
+    public void insertRandomProducts(int count) {
+        repo.insertRandomProducts(count);
+    }
+
+    public List<Product> getBoughtProductsCircle(User user) {
+        return repo.getBoughtProductsCircle(user.getId());
+    }
+
+    public int getBoughtProductCountCircle(User user, Product product) {
+        return repo.getBoughtProductCountCircle(user.getId(), product.getId());
+    }
+
+    public int getBoughtProductByProductAndDepth(String product, int depth) {
+        return repo.findBoughtProductByProductAndDepth(product, depth);
+    }
+
+    public void followRandomUsers() {
+        repo.followRandomUsers(repo.findAll());
     }
 }
