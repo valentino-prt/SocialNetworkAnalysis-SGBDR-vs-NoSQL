@@ -1,7 +1,8 @@
 package org.example.socialnetworkanalysissgbdr.services;
 
-import org.infres14.neo4jtest.sql.data.Product;
-import org.infres14.neo4jtest.sql.repos.ProductRepo;
+
+import org.example.socialnetworkanalysissgbdr.data.Product;
+import org.example.socialnetworkanalysissgbdr.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

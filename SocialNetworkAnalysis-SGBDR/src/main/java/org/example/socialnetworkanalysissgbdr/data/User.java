@@ -95,6 +95,11 @@ public class User {
         user.getFollowers().add(this); // Ensure bidirectional relationship is maintained
     }
 
+    public void followedBy(User user) {
+        followers.add(user);
+    }
+
+
     public int getFollowerCount() {
         return this.followers.size();
     }
