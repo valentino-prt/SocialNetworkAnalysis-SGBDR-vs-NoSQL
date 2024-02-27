@@ -4,6 +4,8 @@ services:
   postgres:
     image: postgres
     restart: unless-stopped
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: z9BIE3A2tNHJJqXY
