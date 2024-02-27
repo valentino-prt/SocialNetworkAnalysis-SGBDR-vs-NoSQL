@@ -188,4 +188,9 @@ public class UserRepoImpl implements CustomUserRepository {
 
 
     }
+
+    @Override
+    public List<Product> getBoughtProductsCircle(long userId) {
+        return null;
+    }
 }
