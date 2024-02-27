@@ -1,9 +1,7 @@
 package org.example.socialnetworkanalysisnosql.services;
 
 
-import org.example.socialnetworkanalysisnosql.data.Product;
 import org.example.socialnetworkanalysisnosql.data.User;
-import org.example.socialnetworkanalysisnosql.repos.product.ProductRepo;
 import org.example.socialnetworkanalysisnosql.repos.user.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,15 +34,15 @@ public class UserService {
         userRepo.insertRandomUsers(count);
     }
 
-    public int getBoughtProductCountCircle(User user, Product product) {
-        return userRepo.getBoughtProductCountCircle(user.getId(), product.getId());
+    public int getBoughtProductCountCircle(String user, String product) {
+        return userRepo.getBoughtProductCountCircle(user, product);
     }
 
-    public void followRandomUsers() {
-        userRepo.followRandomUsers(userRepo.findAll());
+    public void followUsersFromCsv() {
+        userRepo.followUsersFromCsv();
     }
 
-    public void buyRandomProducts(List<Product> products, int userCount) {
-        userRepo.buyRandomProducts(products, userCount);
+    public void buyProductsFromCsv() {
+        userRepo.buyProductsFromCsv();
     }
 }

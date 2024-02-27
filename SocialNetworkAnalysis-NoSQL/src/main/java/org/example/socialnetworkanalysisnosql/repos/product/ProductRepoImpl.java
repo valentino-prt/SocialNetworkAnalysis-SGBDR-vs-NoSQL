@@ -19,7 +19,7 @@ public class ProductRepoImpl implements CustomProductRepo {
     @Override
     public void insertRandomProducts(int count) {
         String cypherQuery = "UNWIND range(1, $count) AS id\n" +
-                "CREATE (p:Product {name: 'Product ' + id, description: 'Description ' + id, price: rand() * 100})";
+                "CREATE (p:Product {name: 'Product' + id, description: 'Description ' + id, price: rand() * 100})";
 
         try (Session session = driver.session()) {
             session.run(cypherQuery, Values.parameters("count", count));

@@ -29,17 +29,19 @@ public class StartRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        userService.dump();
-        productService.dump();
-
-        userService.insertRandomUsers(500000);
-        productService.insertRandomProducts(1000);
-        userService.followRandomUsers();
-        userService.buyRandomProducts(productService.findAll(), 500000);
-
-        List<Product> products;
-        products = productService.getBoughtProductsCircle("User2", 2);
-        System.out.println("Products bought by User2 and his followers: ");
+//        userService.dump();
+//        productService.dump();
+//
+//        userService.insertRandomUsers(1000000);
+//        productService.insertRandomProducts(10000);
+//        userService.followUsersFromCsv();
+//        userService.buyProductsFromCsv();
+//
+//        List<Product> products;
+//        products = productService.getBoughtProductsCircle("User2", 2);
+//        int count = userService.getBoughtProductCountCircle("User2", "Product3");
+//        int count2 = productService.getBoughtProductByProductAndDepth("Product3", 2);
+//        System.out.println("Products bought by User2 and his followers: ");
     }
 
     private void generateProducts(int count) {
@@ -151,7 +153,7 @@ public class StartRunner implements ApplicationRunner {
         userService.save(userF);
 
         List<Product> products = this.productService.getBoughtProductsCircle(userC.getName(), 1);
-        int count = this.userService.getBoughtProductCountCircle(userA, productA);
+        int count = this.userService.getBoughtProductCountCircle(userA.getName(), productA.getName());
         int count2 = this.productService.getBoughtProductByProductAndDepth(productA.getName(), 2);
 
         System.out.println("Products bought by userA and his followers: ");
