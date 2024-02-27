@@ -1,4 +1,4 @@
-package org.example.socialnetworkanalysisnosql.repos;
+package org.example.socialnetworkanalysisnosql.repos.user;
 
 import org.example.socialnetworkanalysisnosql.data.Product;
 import org.example.socialnetworkanalysisnosql.data.User;
@@ -12,11 +12,7 @@ import java.util.List;
 
 public interface CustomUserRepository {
 
-    int findBoughtProductByProductAndDepth(String productName, int depth);
-
     void insertRandomUsers(int count);
-
-    void insertRandomProducts(int count);
 
     void followRandomUsers(List<User> users);
 }

@@ -2,7 +2,7 @@ package org.example.socialnetworkanalysisnosql.services;
 
 import org.example.socialnetworkanalysisnosql.data.Product;
 import org.example.socialnetworkanalysisnosql.data.User;
-import org.example.socialnetworkanalysisnosql.repos.ProductRepo;
+import org.example.socialnetworkanalysisnosql.repos.product.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +26,18 @@ public class ProductService {
     public void dump() {
         while (repo.count() > 0)
             repo.dumpLimit();
+    }
+
+    public void insertRandomProducts(int count) {
+        repo.insertRandomProducts(count);
+    }
+
+    public List<Product> getBoughtProductsCircle(User user) {
+        return repo.getBoughtProductsCircle(user.getId());
+    }
+
+    public int getBoughtProductByProductAndDepth(String product, int depth) {
+        return repo.findBoughtProductByProductAndDepth(product, depth);
     }
 
     public Product getProductByName(String s) {

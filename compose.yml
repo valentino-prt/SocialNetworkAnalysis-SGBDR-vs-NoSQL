@@ -19,9 +19,12 @@ services:
       - "7687:7687" # Port pour les connexions Bolt
     volumes:
       - $HOME/neo4j/data:/data # Emplacement pour persister les données de Neo4J
+      - ./neo4j/import:/var/lib/neo4j/import
+      - ./neo4j/conf:/var/lib/neo4j/conf
+
     environment:
       - NEO4J_AUTH=none # Désactiver l'authentification
-
+      - NEO4J_dbms_directories_import=/var/lib/neo4j/import
 volumes:
   neo4j-data:
   postgres-data:

@@ -34,7 +34,7 @@ public class StartRunner implements ApplicationRunner {
 
 
         userService.insertRandomUsers(500000);
-        userService.insertRandomProducts(1000);
+        productService.insertRandomProducts(1000);
         userService.followRandomUsers();
 
     }
@@ -147,9 +147,9 @@ public class StartRunner implements ApplicationRunner {
         userService.save(userE);
         userService.save(userF);
 
-        List<Product> products = this.userService.getBoughtProductsCircle(userA);
+        List<Product> products = this.productService.getBoughtProductsCircle(userA);
         int count = this.userService.getBoughtProductCountCircle(userA, productA);
-        int count2 = this.userService.getBoughtProductByProductAndDepth(productA.getName(), 2);
+        int count2 = this.productService.getBoughtProductByProductAndDepth(productA.getName(), 2);
 
         System.out.println("Products bought by userA and his followers: ");
         products.forEach(System.out::println);
