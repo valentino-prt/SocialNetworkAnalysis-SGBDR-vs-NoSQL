@@ -10,8 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ProductRepo extends JpaRepository<Product, Long>, CustomProductRepo {
-//    Product findByName(String s);
-//
-//    List<Product> getBoughtProductsCircle(@Param("userId") long userId);
 
 }

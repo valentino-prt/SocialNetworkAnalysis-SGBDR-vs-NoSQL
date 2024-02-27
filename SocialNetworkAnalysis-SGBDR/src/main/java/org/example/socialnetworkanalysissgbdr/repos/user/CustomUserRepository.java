@@ -9,9 +9,8 @@ import java.util.List;
 public interface CustomUserRepository {
 
     void insertRandomUsers(int count);
-
-    void followRandomUsers(List<User> users);
-
-    List<Product> getBoughtProductsCircle(@Param("userId") long userId);
+    void followUsersFromCsv();
+    int getBoughtProductCountCircle(String userId, String productId);
+    void buyProductsFromCsv();
 
 }
