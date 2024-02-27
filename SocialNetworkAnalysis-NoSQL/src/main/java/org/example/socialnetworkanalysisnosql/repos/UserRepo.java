@@ -13,12 +13,6 @@ import java.util.List;
 public interface UserRepo extends Neo4jRepository<User, Long>, CustomUserRepository {
 
     @Query("MATCH (influencer:User) <-[:FOLLOWERS*1..]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
-            "WHERE id(influencer) = $userId\n" +
-            "WITH product, COLLECT(DISTINCT follower) AS buyers\n" +
-            "RETURN product.id AS id, product.name AS name, product.description AS description, product.price AS price, buyers AS boughtBy")
-    List<Product> getBoughtProductsCircle(@Param("userId") long userId);
-
-    @Query("MATCH (influencer:User) <-[:FOLLOWERS*1..]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
             "WHERE id(influencer) = $userId AND id(product) = $productId\n" +
             "WITH COUNT(DISTINCT follower) AS buyersCount\n" +
             "RETURN buyersCount")

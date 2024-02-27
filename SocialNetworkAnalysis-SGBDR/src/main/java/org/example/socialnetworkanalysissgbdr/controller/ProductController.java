@@ -5,6 +5,9 @@ import org.example.socialnetworkanalysissgbdr.data.Product;
 import org.example.socialnetworkanalysissgbdr.services.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springdoc.api.annotations.Operation;
+
+
 @RestController
 @RequestMapping("/products")
 public class ProductController {

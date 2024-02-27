@@ -63,7 +63,28 @@ public class UserRepoImpl implements CustomUserRepository {
     }
 
     @Override
+    public List<Product> getBoughtProductsCircle(long userId) {
+        String query = "\"MATCH (influencer:User) <-[:FOLLOWERS*1..]-(follower:User)-[:BOUGHT]->(product:Product)\\n\" +\n" +
+                "        \"WHERE id(influencer) = $userId\\n\" +\n" +
+                "        \"WITH product, COLLECT(DISTINCT follower) AS buyers\\n\" +\n" +
+                "        \"RETURN product.id AS id, product.name AS name, product.description AS description, product.price AS price, buyers AS boughtBy\"
+    }
+
+    /**
+     * Établit des relations de suivi aléatoires entre les utilisateurs dans la liste fournie.
+     * Pour chaque utilisateur, un nombre aléatoire d'utilisateurs à suivre est choisi parmi la liste,
+     * à l'exception de lui-même. Une relation `:FOLLOWS` est ensuite créée entre l'utilisateur et chaque utilisateur choisi.
+     *
+     * @param users Liste d'objets {@code User} parmi lesquels les relations de suivi seront établies.
+     *              Chaque utilisateur peut suivre entre 0 et 9 autres utilisateurs aléatoires de la liste.
+     *
+     * Note: Cette méthode assume que tous les utilisateurs existent déjà dans la base de données Neo4j
+     *       et sont uniques par leur ID. Les relations de suivi sont créées en utilisant la transaction
+     *       d'écriture de Neo4j pour assurer l'intégrité des données.
+     */
+    @Override
     public void followRandomUsers(List<User> users) {
+
 
         Random rand = new Random();
         List<Map<String, Object>> followPairs = new ArrayList<>();
@@ -96,4 +117,7 @@ public class UserRepoImpl implements CustomUserRepository {
             });
         }
     }
+
+    getb
 }
+

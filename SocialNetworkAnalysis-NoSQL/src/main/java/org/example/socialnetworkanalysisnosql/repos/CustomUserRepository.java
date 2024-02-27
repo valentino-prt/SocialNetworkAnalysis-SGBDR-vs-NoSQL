@@ -7,6 +7,7 @@ import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Values;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,4 +20,7 @@ public interface CustomUserRepository {
     void insertRandomProducts(int count);
 
     void followRandomUsers(List<User> users);
+
+    List<Product> getBoughtProductsCircle(@Param("userId") long userId);
+
 }
