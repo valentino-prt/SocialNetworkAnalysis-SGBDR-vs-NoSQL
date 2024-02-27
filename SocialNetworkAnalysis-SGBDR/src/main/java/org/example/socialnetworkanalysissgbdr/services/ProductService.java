@@ -11,32 +11,32 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private final ProductRepo repo;
-
-    @Autowired
-    public ProductService(ProductRepo repo) {
-        this.repo = repo;
-    }
-
-    public Product createProduct(String name, String description, double price) {
-        Product product = new Product(name, description, price);
-        repo.save(product);
-        return product;
-    }
-
-    public void dump() {
-        this.repo.deleteAll();
-    }
-
-    public Product getProductByName(String name) {
-        return this.repo.findByName(name);
-    }
-
-    public void save(Product product) {
-        this.repo.save(product);
-    }
-
-    public List<Product> findAll() {
-        return this.repo.findAll();
-    }
+//    private final ProductRepo repo;
+//
+//    @Autowired
+//    public ProductService(ProductRepo repo) {
+//        this.repo = repo;
+//    }
+//
+//    public Product createProduct(String name, String description, double price) {
+//        Product product = new Product(name, description, price);
+//        repo.save(product);
+//        return product;
+//    }
+//
+//    public void dump() {
+//        this.repo.deleteAll();
+//    }
+//
+//    public Product getProductByName(String name) {
+//        return this.repo.findByName(name);
+//    }
+//
+//    public void save(Product product) {
+//        this.repo.save(product);
+//    }
+//
+//    public List<Product> findAll() {
+//        return this.repo.findAll();
+//    }
 }
