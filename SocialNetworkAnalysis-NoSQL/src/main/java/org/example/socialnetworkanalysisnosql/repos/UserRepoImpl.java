@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class UserRepoImpl implements CustomUserRepository {
@@ -35,13 +36,13 @@ public class UserRepoImpl implements CustomUserRepository {
     @Override
     public void insertRandomUsers(int count) {
         String cypherQuery = "UNWIND range(1, $count) AS id\n" +
-                "CREATE (u:User {name: 'User ' + id})";
+                "CREATE (u:User {name: 'User' + id})";
 
         try (Session session = driver.session()) {
             session.run(cypherQuery, Values.parameters("count", count));
         }
 
-        String queryIndex = "CREATE INDEX user_id_index IF NOT EXISTS FOR (u:User) ON (u.id)\n";
+        String queryIndex = "CREATE INDEX user_name_index IF NOT EXISTS FOR (u:User) ON (u.name)\n";
         try (Session session = driver.session()) {
             session.run(queryIndex);
         }
@@ -66,34 +67,47 @@ public class UserRepoImpl implements CustomUserRepository {
     public void followRandomUsers(List<User> users) {
 
         Random rand = new Random();
+        int randomInt;
+        int randomCountFollowers;
         List<Map<String, Object>> followPairs = new ArrayList<>();
 
-        for (User user : users) {
+        for(User user : users) {
+
             System.out.println("User : " + user.getId());
 
-            for (int i = 0; i < rand.nextInt(0,10); i++) {
-                int randomInt;
+            for(int i = 0; i < rand.nextInt(0, 10); i++){
                 do {
-                    randomInt = rand.nextInt(users.size());
+                    randomInt = rand.nextInt(0, users.size() - 1);
                 } while (users.get(randomInt).getId() == user.getId());
 
                 Map<String, Object> pair = new HashMap<>();
-                pair.put("userId", user.getId());
-                pair.put("followUserId", users.get(randomInt).getId());
+                pair.put("userName", user.getName());
+                pair.put("followerUserName", users.get(randomInt).getName());
                 followPairs.add(pair);
+
             }
+
+
         }
 
-        try (Session session = driver.session()) {
+        try (Session session = driver.session()){
             session.executeWrite(tx -> {
                 for (Map<String, Object> pair : followPairs) {
-                    String cypherQuery = "MATCH (user:User {id: $userId}), (followUser:User {id: $followUserId}) " +
-                            "WHERE user.id <> followUser.id " +
-                            "MERGE (user)-[:FOLLOWS]->(followUser)";
-                    tx.run(cypherQuery, pair);
+
+                    System.out.println("User : " + pair.get("userName") + " follow : " + pair.get("followerUserName"));
+
+                    String cypherQuery = "MATCH (user:User), (followUser:User)\n" +
+                            "WHERE user.name = $userName AND followUser.name = $followerUserName AND user.name <> followUser.name\n" +
+                            "MERGE (user)-[:FOLLOWS]->(followUser)\n";
+                    tx.run(cypherQuery, Values.parameters("userName", pair.get("userName"), "followerUserName", pair.get("followerUserName")));
+
+
+
                 }
                 return null;
             });
+
         }
+
     }
 }

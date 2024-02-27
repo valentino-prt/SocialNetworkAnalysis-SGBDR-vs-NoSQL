@@ -1,5 +1,6 @@
 package org.example.socialnetworkanalysisnosql.data;
 
+import lombok.Getter;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -12,6 +13,7 @@ import java.util.Set;
 public class User {
 
     @Id @GeneratedValue private Long id;
+    @Getter
     private String name;
     @Relationship(type = "BOUGHT", direction = Relationship.Direction.OUTGOING)
     private Set<Product> boughtProducts = new HashSet<>();
@@ -48,4 +50,5 @@ public class User {
     public int getFollowerCount() {
         return followers.size();
     }
+
 }

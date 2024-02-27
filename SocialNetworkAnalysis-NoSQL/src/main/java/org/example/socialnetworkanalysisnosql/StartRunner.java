@@ -33,8 +33,8 @@ public class StartRunner implements ApplicationRunner {
         productService.dump();
 
 
-        userService.insertRandomUsers(100000);
-        userService.insertRandomProducts(10000);
+        userService.insertRandomUsers(500000);
+        userService.insertRandomProducts(1000);
         userService.followRandomUsers();
 
     }
