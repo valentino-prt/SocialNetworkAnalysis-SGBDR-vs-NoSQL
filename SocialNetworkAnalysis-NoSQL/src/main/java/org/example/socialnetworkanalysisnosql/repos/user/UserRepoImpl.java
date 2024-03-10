@@ -34,24 +34,6 @@ public class UserRepoImpl implements CustomUserRepository {
         }
     }
 
-    @Override
-    public int getBoughtProductCountCircle(String userName, String productName) {
-
-        String query = "MATCH (influencer:User) <-[:FOLLOWERS*1..4]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
-                "WHERE influencer.name = $userName AND product.name = $productName\n" +
-                "WITH COUNT(DISTINCT follower) AS buyersCount\n" +
-                "RETURN buyersCount";
-
-        try (Session session = driver.session()) {
-            Result result = session.run(query, Values.parameters("userName", userName, "productName", productName));
-            if (result.hasNext()) {
-                return result.next().get("buyersCount").asInt();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return -1;
-    }
 
     @Override
     public void buyProductsFromCsv() {
@@ -78,4 +60,24 @@ public class UserRepoImpl implements CustomUserRepository {
     }
 
     }
+
+    @Override
+    public int getBoughtProductCountCircle(String userName, String productName) {
+
+        String query = "MATCH (influencer:User) <-[:FOLLOWERS*1..4]-(follower:User)-[:BOUGHT]->(product:Product)\n" +
+                "WHERE influencer.name = $userName AND product.name = $productName\n" +
+                "WITH COUNT(DISTINCT follower) AS buyersCount\n" +
+                "RETURN buyersCount";
+
+        try (Session session = driver.session()) {
+            Result result = session.run(query, Values.parameters("userName", userName, "productName", productName));
+            if (result.hasNext()) {
+                return result.next().get("buyersCount").asInt();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return -1;
+    }
+
 }

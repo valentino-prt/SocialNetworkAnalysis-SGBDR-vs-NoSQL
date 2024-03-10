@@ -20,10 +20,23 @@ public class ProductRepoImpl implements CustomProductRepo {
     @Override
     @Transactional
     public void insertRandomProducts(int count) {
+        int batchSize = 1000;
+
         for (int i = 1; i <= count; i++) {
-            Product product = new Product("Product" + i, "Description " + i, Math.random() * 100);
-            entityManager.persist(product);
-            if (i % 1000 == 0) {
+            String name = "Product" + i;
+            String description = "Description " + i;
+            double price = Math.random() * 100;
+
+            String sql = "INSERT INTO products (name, description, price) VALUES (:name, :description, :price)";
+
+            Query query = entityManager.createNativeQuery(sql)
+                    .setParameter("name", name)
+                    .setParameter("description", description)
+                    .setParameter("price", price);
+
+            query.executeUpdate();
+
+            if (i % batchSize == 0) {
                 entityManager.flush();
                 entityManager.clear();
             }
@@ -31,7 +44,9 @@ public class ProductRepoImpl implements CustomProductRepo {
     }
 
 
+
     @Override
+    @Transactional
     public int findBoughtProductByProductAndDepth(String productName, int depth) {
         String query = "WITH RECURSIVE follower_tree AS (" +
                 "    SELECT id AS user_id, 0 AS level " +
@@ -54,6 +69,7 @@ public class ProductRepoImpl implements CustomProductRepo {
     }
 
     @Override
+    @Transactional
     public List<Product> getBoughtProductsCircle(String userName, int depth) {
         String sqlQuery = "WITH RECURSIVE follower_tree AS (" +
                 "    SELECT user_id, follower_id, 1 AS level " +
@@ -79,9 +95,9 @@ public class ProductRepoImpl implements CustomProductRepo {
                     @Override
                     public Object transformTuple(Object[] tuple, String[] aliases) {
                         return new Product(
-                                (String) tuple[1],               // assuming name is the second column
-                                (String) tuple[2],               // assuming description is the third column
-                                ((Number) tuple[3]).doubleValue() // assuming price is the fourth column
+                                (String) tuple[1],
+                                (String) tuple[2],
+                                ((Number) tuple[3]).doubleValue()
                         );
                     }
 

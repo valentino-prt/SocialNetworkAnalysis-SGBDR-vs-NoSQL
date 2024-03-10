@@ -19,34 +19,48 @@ public class UserRepoImpl implements CustomUserRepository {
     @Override
     @Transactional
     public void insertRandomUsers(int count) {
+        int batchSize = 1000; // Définissez la taille des lots pour les opérations de batch
+
         for (int i = 1; i <= count; i++) {
-            User user = new User();
-            user.setName("User" + i);
-            entityManager.persist(user);
-            if (i % 1000 == 0) { // Flush et clear pour éviter OutOfMemory
+            // Créez le nom de l'utilisateur
+            String userName = "User" + i;
+
+            // Construisez et exécutez la requête SQL native pour insérer l'utilisateur
+            String sql = "INSERT INTO users (name) VALUES (:name)";
+
+            entityManager.createNativeQuery(sql)
+                    .setParameter("name", userName)
+                    .executeUpdate();
+
+            if (i % batchSize == 0) {
                 entityManager.flush();
                 entityManager.clear();
             }
         }
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
+
     @Override
+    @Transactional
     public int getBoughtProductCountCircle(String userId, String productId) {
         String query = "WITH RECURSIVE follower_tree AS (" +
                 "SELECT follower_id, user_id, 1 AS level " +
                 "FROM user_followers " +
-                "WHERE user_id = :userId " + // Utilisez l'ID de l'utilisateur passé à la méthode
+                "WHERE user_id = :userId " +
                 "UNION ALL " +
                 "SELECT uf.follower_id, ft.user_id, ft.level + 1 " +
                 "FROM user_followers uf " +
                 "INNER JOIN follower_tree ft ON uf.user_id = ft.follower_id " +
-                "WHERE ft.level < 4 " + // Limitez à 4 niveaux de followers
+                "WHERE ft.level < 4 " +
                 ") " +
                 "SELECT COUNT(*) " +
                 "FROM products p " +
                 "INNER JOIN user_bought_products ubp ON p.id = ubp.product_id " +
                 "INNER JOIN follower_tree ft ON ubp.user_id = ft.follower_id " +
-                "WHERE p.id = :productId"; // Utilisez l'ID du produit passé à la méthode
+                "WHERE p.id = :productId";
 
         // Exécutez la requête avec les paramètres
         Query nativeQuery = entityManager.createNativeQuery(query)
@@ -91,7 +105,6 @@ public class UserRepoImpl implements CustomUserRepository {
         ).executeUpdate();
 
         // Étape 2: Chargement des données du fichier CSV dans la table temporaire
-        // Remplacer '/chemin/vers/le/fichier/buyPairs.csv' par le chemin réel du fichier sur le serveur
         entityManager.createNativeQuery(
                 "COPY temp_buy_pairs(user_name, product_name) " +
                         "FROM '/csv/buyPairs.csv' DELIMITER ',' CSV HEADER"
