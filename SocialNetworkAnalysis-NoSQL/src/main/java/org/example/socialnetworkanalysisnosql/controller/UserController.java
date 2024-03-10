@@ -104,4 +104,20 @@ public class UserController {
             return ResponseEntity.internalServerError().body("Erreur lors de la récupération du nombre de produits achetés par " + userName + " et ses followers : " + e.getMessage());
         }
     }
+
+    @GetMapping("/findBoughtProductByProductAndDepth/{productName}/{depth}")
+    public ResponseEntity<?> findBoughtProductByProductAndDepth(@PathVariable String productName, @PathVariable int depth) {
+        try {
+            long startTime, endTime, duration;
+
+            startTime = System.nanoTime();
+            int count = productService.getBoughtProductByProductAndDepth(productName, depth);
+            endTime = System.nanoTime();
+            duration = (endTime - startTime) / 1_000_000; // Convertir en millisecondes
+
+            return ResponseEntity.ok().body("Nombre de produits achetés par " + productName + " et ses followers : " + count + "\nDurée : " + duration + " ms");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors de la récupération du nombre de produits achetés par " + productName + " et ses followers : " + e.getMessage());
+        }
+    }
 }
