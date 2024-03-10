@@ -1,55 +1,98 @@
 package org.example.socialnetworkanalysissgbdr.repos.product;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
+import org.example.socialnetworkanalysissgbdr.data.Product;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.transform.ResultTransformer;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Repository
 public class ProductRepoImpl implements CustomProductRepo {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Override
+    @Transactional
     public void insertRandomProducts(int count) {
-        String sqlInsertProduct = "INSERT INTO product(name, description, price) VALUES (?, ?, ?)";
-
-        // Préparez une liste de tableaux d'objets représentant les paramètres de chaque ligne à insérer
-        List<Object[]> batchArgs = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
-            batchArgs.add(new Object[]{"Product " + i, "Description " + i, Math.random() * 100});
+            Product product = new Product("Product" + i, "Description " + i, Math.random() * 100);
+            entityManager.persist(product);
+            if (i % 1000 == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
         }
-
-        // Utilisez batchUpdate pour insérer en masse
-        jdbcTemplate.batchUpdate(sqlInsertProduct, batchArgs);
-
-        // Assurez-vous que l'index sur product_id existe déjà ou créez-le ici si nécessaire
-        String sqlCreateIndex = "CREATE INDEX IF NOT EXISTS product_id_index ON product(id);";
-        jdbcTemplate.execute(sqlCreateIndex);
     }
 
 
     @Override
     public int findBoughtProductByProductAndDepth(String productName, int depth) {
-        return 0;
+        String query = "WITH RECURSIVE follower_tree AS (" +
+                "    SELECT id AS user_id, 0 AS level " +
+                "    FROM users " +
+                "    WHERE id IN (SELECT user_id FROM user_bought_products WHERE product_id = (SELECT id FROM products WHERE name = :productName)) " +
+                "    UNION ALL " +
+                "    SELECT uf.follower_id, ft.level + 1 " +
+                "    FROM user_followers uf " +
+                "    INNER JOIN follower_tree ft ON uf.user_id = ft.user_id " +
+                "    WHERE ft.level < :depth " +
+                ") " +
+                "SELECT COUNT(DISTINCT user_id) " +
+                "FROM follower_tree WHERE level > 0;"; // Exclut le niveau 0, qui est l'utilisateur qui a fait le premier achat
+
+        Query nativeQuery = entityManager.createNativeQuery(query)
+                .setParameter("productName", productName)
+                .setParameter("depth", depth);
+        Number result = (Number) nativeQuery.getSingleResult();
+        return result.intValue();
     }
 
-//    @Override
-//    public int findBoughtProductByProductAndDepth(String productName, int depth) {
-//        String cypherQuery = String.format(
-//                "MATCH (product:Product {name: \"%s\"})<-[:BOUGHT]-(buyer:User)<-[:FOLLOWERS*1..%d]-(follower:User)-[:BOUGHT]->(product)\n" +
-//                        "RETURN COUNT(DISTINCT follower)", productName, depth);
-//
-//        try (Session session = driver.session()) {
-//            Result result = session.run(cypherQuery);
-//            if (result.hasNext()) {
-//                return result.next().get("COUNT(DISTINCT follower)").asInt();
-//            }
-//        }
-//        return 0;
-//    }
+    @Override
+    public List<Product> getBoughtProductsCircle(String userName, int depth) {
+        String sqlQuery = "WITH RECURSIVE follower_tree AS (" +
+                "    SELECT user_id, follower_id, 1 AS level " +
+                "    FROM user_followers " +
+                "    WHERE follower_id = (SELECT id FROM users WHERE name = :userName) " +
+                "    UNION ALL " +
+                "    SELECT uf.user_id, uf.follower_id, ft.level + 1 " +
+                "    FROM user_followers uf " +
+                "    INNER JOIN follower_tree ft ON uf.follower_id = ft.user_id " +
+                "    WHERE ft.level < :depth " +
+                ") " +
+                "SELECT p.id, p.name, p.description, p.price, ARRAY_AGG(DISTINCT ft.user_id) AS boughtBy " +
+                "FROM products p " +
+                "JOIN user_bought_products ubp ON p.id = ubp.product_id " +
+                "JOIN follower_tree ft ON ubp.user_id = ft.user_id " +
+                "GROUP BY p.id, p.name, p.description, p.price";
+
+        List products = entityManager.createNativeQuery(sqlQuery)
+                .setParameter("userName", userName)
+                .setParameter("depth", depth)
+                .unwrap(NativeQuery.class)
+                .setResultTransformer(new ResultTransformer() {
+                    @Override
+                    public Object transformTuple(Object[] tuple, String[] aliases) {
+                        return new Product(
+                                (String) tuple[1],               // assuming name is the second column
+                                (String) tuple[2],               // assuming description is the third column
+                                ((Number) tuple[3]).doubleValue() // assuming price is the fourth column
+                        );
+                    }
+
+                    @Override
+                    public List transformList(List collection) {
+                        return collection;
+                    }
+                })
+                .getResultList();
+
+        return products;
+    }
 
 }

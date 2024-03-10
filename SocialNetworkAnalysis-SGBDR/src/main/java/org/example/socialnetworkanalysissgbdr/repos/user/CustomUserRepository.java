@@ -10,8 +10,10 @@ public interface CustomUserRepository {
 
     void insertRandomUsers(int count);
 
-    void followRandomUsers(List<User> users);
+    int getBoughtProductCountCircle(String userId, String productId);
 
-    List<Product> getBoughtProductsCircle(@Param("userId") long userId);
+    void followUsersFromCsv();
+
+    void buyProductsFromCsv();
 
 }
