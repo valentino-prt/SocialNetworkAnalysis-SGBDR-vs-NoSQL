@@ -18,7 +18,8 @@ public class UserService {
     }
 
     public void dump() {
-        repo.deleteAllInBatch();
+        while (repo.count() > 0)
+            repo.deleteAllInBatch();
     }
 
     public void save(User user) {
@@ -29,7 +30,40 @@ public class UserService {
         repo.saveAll(users);
     }
 
-    public void createMultipleUsers(int count) {
-        repo.insertRandomUsers(count);
+    public void insertRandomUsers(int count) { repo.insertRandomUsers(count);
     }
+
+    public void followUsersFromCsv() {
+        repo.followUsersFromCsv();
+    }
+
+    public void buyProductsFromCsv() {
+        repo.buyProductsFromCsv();
+    }
+
+    public int getBoughtProductCountCircle(String userName, String productName) {
+        return repo.getBoughtProductCountCircle(userName, productName);
+
+    }
+
+
+//
+//    public UserService() {
+//    }
+//
+//    public void dump() {
+//        repo.deleteAllInBatch();
+//    }
+//
+//    public void save(User user) {
+//        repo.save(user);
+//    }
+//
+//    public void saveAll(List<User> users) {
+//        repo.saveAll(users);
+//    }
+//
+//    public void createMultipleUsers(int count) {
+//        repo.insertRandomUsers(count);
+//    }
 }
